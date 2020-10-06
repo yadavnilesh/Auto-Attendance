@@ -1,0 +1,634 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package main;
+
+import static java.awt.Color.gray;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import static java.awt.image.BufferedImage.TYPE_INT_RGB;
+import java.awt.image.DataBufferByte;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.highgui.Highgui;
+//import org.opencv.imgcodecs.Imgcodecs;
+import org.bytedeco.javacpp.opencv_face.*;
+import static org.opencv.highgui.Highgui.CV_LOAD_IMAGE_GRAYSCALE;
+
+import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.CascadeClassifier;
+import org.opencv.highgui.VideoCapture;
+import static org.opencv.imgproc.Imgproc.COLOR_BGRA2GRAY;
+import static org.opencv.imgproc.Imgproc.cvtColor;
+import static org.opencv.imgproc.Imgproc.equalizeHist;
+//import org.bytedeco.javacpp.opencv_core.*;
+//import org.bytedeco.javacpp.opencv_face.FaceRecognizer;
+
+/**
+ *
+ * @author niraj
+ */
+public class livecamera extends javax.swing.JFrame {
+
+    /**
+     * Creates new form livecamera
+     */
+        FaceRecognizer faceRecognizer;
+        CascadeClassifier faceDetector = new CascadeClassifier(livecamera.class.getResource("haarcascade_frontalface_alt.xml").getPath().substring(1));
+    //public CascadeClassifier faceDetector = new CascadeClassifier("haarcascade_frontalface_default.xml");//Our face detection method 
+    private DaemonThread myThread = null;
+    int count = 0;
+    VideoCapture webSource = null;
+    String v;
+    BufferedImage buf;
+    File f=new File("C:\\Users\\niraj\\Pictures\\test1.jpg");
+    Mat frame = new Mat();
+    MatOfRect faceDetections = new MatOfRect();
+    MatOfByte mem = new MatOfByte();
+    private String s;
+    BufferedImage[] bm;
+    int totaldet,current;
+    File d=new File("C:\\Users\\niraj\\Pictures\\project\\IMG"+current+".jpg");
+    Image dm ;
+    BufferedImage duf ;
+    class DaemonThread implements Runnable
+    {
+    protected volatile boolean runnable = false;
+
+    @Override
+    public  void run()
+    {
+        synchronized(this)
+        {
+            while(runnable)
+            {
+                if(webSource.grab())
+                {
+		    	try
+                        {
+                            webSource.retrieve(frame);
+			     Highgui.imencode(".bmp", frame, mem);
+			    Image im = ImageIO.read(new ByteArrayInputStream(mem.toArray()));
+			    BufferedImage buff = (BufferedImage) im;
+			    Graphics g=jPanel1.getGraphics();
+			    g.drawImage(buff, 0, 0, jPanel1.getWidth(), jPanel1.getHeight(), 0, 0, buff.getWidth(), buff.getHeight(), null);
+            		    if(runnable == false)
+                            {
+			    	System.out.println("Going to wait()");
+			    	this.wait();
+			    }
+			 }
+			 catch(Exception ex)
+                         {
+			    System.out.println("Error");
+                         }
+                }
+            }
+        }
+     }
+   }
+
+    public livecamera() {
+        initComponents();
+        //setExtendedState(livecamera.MAXIMIZED_BOTH);    
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+    this.setLocation(dim.width/2-this.getSize().width/2, (dim.height-40)/2-this.getSize().height/2);
+        this.addWindowStateListener(new WindowAdapter() {
+            @Override
+            public void windowStateChanged(WindowEvent we) {
+                if (we.getNewState() == Frame.ICONIFIED) {
+                     v=new String("C:\\Users\\niraj\\Pictures\\project\\backup.jpg");
+                     Highgui.imwrite(v, frame);
+                }
+            }
+        });
+      
+    
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        fileChooser = new javax.swing.JFileChooser();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jButton4 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
+        jButton9 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
+        jTextField2 = new javax.swing.JTextField();
+        jButton11 = new javax.swing.JButton();
+
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setMinimumSize(new java.awt.Dimension(700, 500));
+        fileChooser.setPreferredSize(new java.awt.Dimension(900, 600));
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setLocation(new java.awt.Point(0, 0));
+        setResizable(false);
+        setSize(new java.awt.Dimension(0, 0));
+
+        jButton1.setText("Start");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("pause");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("take photo");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 951, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 951, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 591, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE))
+        );
+
+        jButton4.setText("Detect Face");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        jButton5.setText(">");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
+        jButton6.setText(">>");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
+        jButton7.setText("<<");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+
+        jButton8.setText("<");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+
+        jButton9.setText("Add to tarining set");
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton9ActionPerformed(evt);
+            }
+        });
+
+        jButton10.setText("choose image");
+        jButton10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton10ActionPerformed(evt);
+            }
+        });
+
+        jTextField2.setEditable(false);
+        jTextField2.setEnabled(false);
+
+        jButton11.setText("Train");
+        jButton11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton11ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 852, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton10))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(46, 46, 46)
+                        .addComponent(jButton1)
+                        .addGap(127, 127, 127)
+                        .addComponent(jButton2)
+                        .addGap(117, 117, 117)
+                        .addComponent(jButton3)
+                        .addGap(129, 129, 129)
+                        .addComponent(jButton4)
+                        .addGap(89, 89, 89)
+                        .addComponent(jButton11)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton5))
+                    .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton8)
+                            .addComponent(jButton7)
+                            .addComponent(jButton6)
+                            .addComponent(jButton5))
+                        .addGap(42, 42, 42)
+                        .addComponent(jButton9))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton10)
+                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton4)
+                            .addComponent(jButton3)
+                            .addComponent(jButton2)
+                            .addComponent(jButton1)
+                            .addComponent(jButton11))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        webSource =new VideoCapture(0);
+        myThread = new DaemonThread();
+        Thread t = new Thread(myThread);
+        t.setDaemon(true);
+        myThread.runnable = true;
+        t.start();
+	jButton1.setEnabled(false);  //start button
+        jButton2.setEnabled(true);  
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        myThread.runnable = false;
+            jButton2.setEnabled(false);   
+            jButton1.setEnabled(true);
+            
+            webSource.release();			
+
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        Date dNow = new Date( );
+        SimpleDateFormat ft =new SimpleDateFormat ("yyyyMMddhhmmss");
+        String s=ft.format(dNow);
+        v=new String("C:\\Users\\niraj\\Pictures\\project\\test.jpg");
+        Highgui.imwrite(v, frame);
+        myThread.runnable = false;
+        jButton2.setEnabled(false);
+        jButton1.setEnabled(true);
+        webSource.release();
+        File f=new File(v);
+        try
+        {
+             Image im = ImageIO.read(f);
+             buf = (BufferedImage) im;
+             Graphics g=jPanel1.getGraphics();
+             g.drawImage(buf, 0, 0, jPanel1.getWidth(), jPanel1.getHeight(), 0, 0, buf.getWidth(), buf.getHeight(), null);
+        }
+        catch(Exception ex)
+        {
+         ex.printStackTrace();;
+        }
+       
+  //  } else {
+    //    System.out.println("File access cancelled by user.");
+    //}
+    }//GEN-LAST:event_jButton3ActionPerformed
+     
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        
+        try
+        {
+             Image im = ImageIO.read(f);
+             buf = (BufferedImage) im;     
+        Mat col ;
+        col = new Mat(buf.getHeight(), buf.getWidth(), CvType.CV_8UC3);
+        byte[] data = ((DataBufferByte) buf.getRaster().getDataBuffer()).getData();
+        col.put(0, 0, data);
+        cvtColor(col, frame, COLOR_BGRA2GRAY);        
+        if(faceDetector.empty())
+            JOptionPane.showMessageDialog(null, "error loading");
+
+        faceDetector.detectMultiScale(frame, faceDetections,1.1,5,0,new Size(50,50),new Size());
+        totaldet=faceDetections.toArray().length;
+        bm=new BufferedImage[totaldet];
+        //String s=Integer.toString(j);
+        Mat m=new Mat();
+        int k=0;
+            for (Rect rect : faceDetections.toArray())
+            {
+                 rect.x += (int)(rect.height * 0.175);
+                 rect.y += (int)(rect.width * 0.175);
+                 rect.height -= (int)(rect.height * 0.275);
+                 rect.width -= (int)(rect.width * 0.275);
+                 m=new Mat(frame,rect);
+                 //v=new String("C:\\Users\\niraj\\Pictures\\project\\IMG"+k+".jpg");
+                 Imgproc.resize(m, m, new Size(200,200));
+               equalizeHist(m, m);
+                MatOfByte me = new MatOfByte();
+                Highgui.imencode(".bmp", m, me);
+                Image i = ImageIO.read(new ByteArrayInputStream(me.toArray()));
+                bm[k] = (BufferedImage) i;
+                k++;
+            }
+            for (Rect rect : faceDetections.toArray())
+            {
+                 rect.x += (int)(rect.height * 0.1);
+                 rect.y += (int)(rect.width * 0.1);
+                 rect.height -= (int)(rect.height * 0.1);
+                 rect.width -= (int)(rect.width * 0.225);
+                Core.rectangle(col, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
+                                        new Scalar(0, 0,255),5);
+            }
+            MatOfByte me = new MatOfByte();
+             Imgproc.resize(col, m, new Size(jLabel1.getWidth(), jLabel1.getHeight()));
+            Highgui.imencode(".bmp", m, me);
+           Image i = ImageIO.read(new ByteArrayInputStream(me.toArray()));
+           BufferedImage bu = (BufferedImage) i;
+            jLabel1.setIcon(new ImageIcon(bu));
+            current=0;
+            jLabel2.setIcon(new ImageIcon(bm[0]));
+        }
+        catch(Exception ex)
+        {
+         ex.printStackTrace();;
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+        // TODO add your handling code here:
+       // JFileChooser fileChooser = new JFileChooser();
+         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+         //FileNameExtensionFilter filter = new FileNameExtensionFilter("*.IMAGE", "jpg","gif","png","bmp");
+        FileFilter imageFilter = new FileNameExtensionFilter(
+    "Image files", ImageIO.getReaderFileSuffixes());
+         fileChooser.addChoosableFileFilter(imageFilter);
+         int result = fileChooser.showSaveDialog(null);
+         if(result == JFileChooser.APPROVE_OPTION){
+             File selectedFile = fileChooser.getSelectedFile();
+             String path = selectedFile.getAbsolutePath();
+            // label.setIcon(ResizeImage(path));
+             s = path;
+             f=new File(s);
+             try{
+             Image img=ImageIO.read(f);
+            BufferedImage bu = (BufferedImage) img;
+            frame = new Mat(bu.getHeight(), bu.getWidth(), CvType.CV_8UC3);
+             byte[] data = ((DataBufferByte) bu.getRaster().getDataBuffer()).getData();
+            frame.put(0, 0, data);
+            Mat m=new Mat();
+            Imgproc.resize(frame, m, new Size(jLabel1.getWidth(), jLabel1.getHeight()));
+            MatOfByte me=new MatOfByte();
+            Highgui.imencode(".bmp", m, me);
+            Image i = ImageIO.read(new ByteArrayInputStream(me.toArray()));
+            bu = (BufferedImage) i;
+            jLabel1.setIcon(new ImageIcon(bu));
+            //Graphics g=jPanel1.getGraphics();
+            //g.drawImage(bu, 0, 0, jPanel1.getWidth(), jPanel1.getHeight(), 0, 0, bu.getWidth(), bu.getHeight(), null);   
+             }
+             catch(Exception ex)
+             {
+                 ex.printStackTrace();
+             }
+                 
+              }
+         else if(result == JFileChooser.CANCEL_OPTION){
+             System.out.println("No Data");
+         }
+     jTextField2.setText(s);
+    }//GEN-LAST:event_jButton10ActionPerformed
+
+    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
+        // TODO add your handling code here:
+        faceRecognizer=EigenFaceRecognizer.create();
+        
+    }//GEN-LAST:event_jButton11ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // TODO add your handling code here:
+
+     current++;
+     if(current<totaldet)
+     {
+                      jLabel2.setIcon(new ImageIcon(bm[current]));
+
+         try {
+                 //  d=new File("C:\\Users\\niraj\\Pictures\\project\\IMG"+current+".jpg");
+
+         //    dm = ImageIO.read(d);
+           //  duf = (BufferedImage) dm;
+         } catch (Exception ex) {
+             ex.printStackTrace();
+         }
+ }
+     else
+       current--;
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        // TODO add your handling code here:
+        current--;
+     if(current>=0)
+     {
+        jLabel2.setIcon(new ImageIcon(bm[current]));
+     }
+     else
+       current++;
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        // TODO add your handling code here:
+      jLabel2.setIcon(new ImageIcon(bm[0]));
+
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        jLabel2.setIcon(new ImageIcon(bm[totaldet-1]));
+
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        // TODO add your handling code here:
+        try{           
+        Class.forName("com.mysql.jdbc.Driver");  // MySQL database connection
+        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/facedb?" + "user=root&password=root");     
+        PreparedStatement ps = con.prepareStatement("insert into studentinfo(name,image) values(?,?)");
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(bm[current], "jpg", os);
+        InputStream is = new ByteArrayInputStream(os.toByteArray());
+              //InputStream is = new FileInputStream(new File(bm[current]));
+               ps.setString(1, jTextField1.getText());
+              // ps.setString(2, s);
+               ps.setBlob(2,is);
+               ps.executeUpdate();
+         }
+         catch(Exception e)
+         {
+             e.printStackTrace();
+         }
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(livecamera.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(livecamera.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(livecamera.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(livecamera.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new livecamera().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JFileChooser fileChooser;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton11;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    // End of variables declaration//GEN-END:variables
+}
